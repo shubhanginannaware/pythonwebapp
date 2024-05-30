@@ -1,0 +1,32 @@
+name: Cleanup Artifacts
+ 
+on:
+  schedule:
+    - cron: "0 0 * * 0"  # Runs every Sunday at midnight
+ 
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+ 
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+ 
+    - name: Install GitHub CLI
+      run: sudo apt-get install gh
+ 
+    - name: Authenticate GitHub CLI
+      env:
+        GITHUB_TOKEN: ${{ secrets.SHUBHI_TOKEN_GITHUB }}
+      run: gh auth login --with-token <<< $GITHUB_TOKEN
+    - name: List and delete old artifacts
+      env:
+        GITHUB_TOKEN: ${{ secrets.SHUBHI_TOKEN_GITHUB }}
+      run: |
+        days=7
+        date=$(date -d "-$days days" +%Y-%m-%dT%H:%M:%SZ)
+        echo "Deleting artifacts older than $days days"
+        for artifact_id in $(gh api repos/bizrepoadmin/cs-dream11-bot-/actions/artifacts --paginate -q '.artifacts[] | select(.expired == false and .created_at < "'$date'") | .id'); do
+          echo "Deleting artifact $artifact_id"
+          gh api --method DELETE repos/bizrepoadmin/cs-dream11-bot-/actions/artifacts/$artifact_id
+        done
