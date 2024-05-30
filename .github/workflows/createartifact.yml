@@ -7,7 +7,7 @@ on:
   #   - cron: "*/5 * * * *"  # Runs every 5 minutes (uncomment for scheduled execution)
 
 jobs:
-  cleanup:
+  cleanup: 
     runs-on: ubuntu-latest
 
     steps:
