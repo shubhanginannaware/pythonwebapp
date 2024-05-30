@@ -1,6 +1,7 @@
 name: Cleanup Artifacts
 
 on:
+ workflow_dispatch:  # Trigger on manual dispatch
   # Comment out the schedule section for manual execution
   # schedule:
   #   - cron: "*/5 * * * *"  # Runs every 5 minutes (uncomment for scheduled execution)
