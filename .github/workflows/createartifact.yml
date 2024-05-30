@@ -1,32 +1,30 @@
 name: Cleanup Artifacts
 
 on:
- workflow_dispatch:  # Trigger on manual dispatch
-  # Comment out the schedule section for manual execution
-  # schedule:
-  #   - cron: "*/5 * * * *"  # Runs every 5 minutes (uncomment for scheduled execution)
+  schedule:
+    - cron: "*/5 * * * *"  # Runs every 5 minutes
 
 jobs:
-  cleanup: 
+  cleanup:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
 
-      - name: Install GitHub CLI (if needed, comment out if already installed)
-        run: sudo apt-get install gh  # Comment out if pre-installed
+      - name: Install GitHub CLI
+        run: sudo apt-get install gh
 
       - name: Authenticate GitHub CLI
         env:
-          GITHUB_TOKEN: ${{ secrets.SHUBHI_TOKEN_GITHUB }}
+          GITHUB_TOKEN: ${{ secrets.ARTIFACT_GITHUB_TOKEN }}
         run: gh auth login --with-token <<< $GITHUB_TOKEN
 
       - name: List and delete old artifacts
         env:
-          GITHUB_TOKEN: ${{ secrets.SHUBHI_TOKEN_GITHUB }}
+          GITHUB_TOKEN: ${{ secrets.ARTIFACT_GITHUB_TOKEN }}
         run: |
-          days=1
+          days=7
           date=$(date -d "-$days days" +%Y-%m-%dT%H:%M:%SZ)
           echo "Deleting artifacts older than $days days"
           for artifact_id in $(gh api repos/shubhanginannaware/pythonwebapp/actions/artifacts --paginate -q '.artifacts[] | select(.expired == false and .created_at < "'$date'") | .id'); do
