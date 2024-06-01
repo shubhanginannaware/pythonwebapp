@@ -21,6 +21,13 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.SHUBHI_TOKEN_GITHUB }}
         run: gh auth setup-git
 
+      - name: List artifacts before deletion
+        env:
+          GITHUB_TOKEN: ${{ secrets.SHUBHI_TOKEN_GITHUB }}
+        run: |
+          echo "Listing all artifacts before deletion:"
+          gh api repos/shubhanginannaware/pythonwebapp/actions/artifacts --paginate -q '.artifacts[] | {id: .id, name: .name, created_at: .created_at, expired: .expired}'
+
       - name: List and delete old artifacts
         env:
           GITHUB_TOKEN: ${{ secrets.SHUBHI_TOKEN_GITHUB }}
@@ -32,3 +39,10 @@ jobs:
             echo "Deleting artifact $artifact_id"
             gh api --method DELETE repos/shubhanginannaware/pythonwebapp/actions/artifacts/$artifact_id
           done
+
+      - name: List artifacts after deletion
+        env:
+          GITHUB_TOKEN: ${{ secrets.SHUBHI_TOKEN_GITHUB }}
+        run: |
+          echo "Listing all artifacts after deletion:"
+          gh api repos/shubhanginannaware/pythonwebapp/actions/artifacts --paginate -q '.artifacts[] | {id: .id, name: .name, created_at: .created_at, expired: .expired}'
